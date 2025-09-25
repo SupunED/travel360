@@ -2,3 +2,13 @@
 {% block title %}
     Records
 {% endblock %}
+{% block main %}
+<h2>Your Saved Records</h2>
+<ul>
+    {% for record in records %}
+        <li><strong>{{ record.name }}</strong> - Population: {{ record.population }}</li>
+    {% else %}
+        <li>No saved records yet.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -1,4 +1,4 @@
-from flask import Flask, flash, render_template, redirect, request, session
+from flask import Flask, flash, jsonify, render_template, redirect, request, session
 from pymongo import MongoClient
 from flask_session import Session
 import requests
@@ -133,6 +133,7 @@ def login_google():
         "redirect_uri": GOOGLE_REDIRECT_URI,
         "response_type": "code",
         "scope": "openid profile email",
+        "prompt": "select_account"
     }
     return redirect(f"{GOOGLE_AUTHORIZATION_URL}?{requests.compat.urlencode(params)}")
 
@@ -252,17 +253,35 @@ def register():
             return redirect("/")
         
 
+@app.route("/save", methods=["POST"])
+@login_required
+def save():
+    try:
+        data = request.get_json()
+        if not data:
+            flash("No data provided", "error")
+            return redirect("/")
+        
+        data["user_id"] = session.get("user_id")
+        
+        db.records.insert_one(data)
+        return jsonify({"status": "success", "message": "Data saved successfully!"}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
 @app.route("/documentation")
 @login_required
 def documentation():
     return render_template("documentation.html")
 
 
-@app.route("/records", methods=["GET", "POST"])
+@app.route("/records", methods=["GET"])
 @login_required
 def records():
-    if request.method == "GET":
-        return render_template("records.html")
+    user_id = session.get("user_id")
+    saved_records = list(db.records.find({'user_id': user_id}))
+    return render_template("records.html", records=saved_records)
 
 if __name__ == "__main__":
     app.run(debug=True)

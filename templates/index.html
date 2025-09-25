@@ -44,6 +44,39 @@
             <p><strong>Today Deaths:</strong> {{ data.todayDeaths if data.todayDeaths is not none else "N/A" }}</p>
             <p><strong>Today Recovered:</strong> {{ data.todayRecovered if data.todayRecovered is not none else "N/A" }}</p>
             <p><strong>Active Cases:</strong> {{ data.active if data.active is not none else "N/A" }}</p>
+
+            <button id="saveToDbBtn" class="btn btn-primary d-block mx-auto">Save to Database</button>
         </div>
     {% endif %}
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const saveBtn = document.getElementById("saveToDbBtn");
+            if (saveBtn) {
+                saveBtn.addEventListener("click", function () {
+                    // Grab aggregated data from Jinja variable (passed by Flask)
+                    const aggregatedData = {{ data|default([])|tojson|safe }};
+                    
+                    fetch("/save", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(aggregatedData)
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        alert(result.message);  // Simple notification
+                    })
+                    .catch(err => {
+                        console.error("Error:", err);
+                        alert("Failed to save data.");
+                    });
+                });
+            }
+        });
+    </script>
+
+
+
 {% endblock %}
