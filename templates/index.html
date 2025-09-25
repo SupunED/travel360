@@ -1,12 +1,49 @@
 {% extends "layout.html" %}
-{% block title%}
+{% block title %}
     Index
 {% endblock %}
 
 {% block main %}
-
     <div class="text-center mb-4">
-        <h1 class="fw-bold">Welcome, {{username}}!</h1>
+        <h1 class="fw-bold">Welcome, {{ username }}!</h1>
     </div>
 
+    <form action="/" method="post">
+        <div class="mb-3">
+            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="country" placeholder="Enter a Country Name" type="text">
+        </div>
+        <button class="btn btn-primary d-block mx-auto" type="submit">Enter</button>
+    </form>
+
+    {% if data %}
+        <div class="text-center card mt-5 shadow p-4">
+            <div class="text-center">
+                <h2 class="fw-bold">{{ data.name }}</h2>
+                {% if data.flag %}
+                    <img src="{{ data.flag }}" alt="Flag of {{ data.name }}" class="img-fluid mt-3" style="max-width: 200px;">
+                {% endif %}
+            </div>
+            <hr>
+
+            <p><strong>Capital:</strong> {{ data.capital[0] if data.capital else "N/A" }}</p>
+            <p><strong>Population:</strong> {{ "{:,}".format(data.population) if data.population else "N/A" }}</p>
+            <p><strong>Continent:</strong> {{ data.continents | join(", ") if data.continents else "N/A" }}</p>
+            <p><strong>Timezone(s):</strong> {{ data.timezones | join(", ") if data.timezones else "N/A" }}</p>
+
+            <h5 class="mt-3">Currency</h5>
+            {% if data.currencies %}
+                {% for code, currency in data.currencies.items() %}
+                    <p>{{ currency.name }} ({{ code }} - {{ currency.symbol }})</p>
+                {% endfor %}
+            {% else %}
+                <p>N/A</p>
+            {% endif %}
+
+            <h5 class="mt-3">COVID-19 Stats</h5>
+            <p><strong>Today Cases:</strong> {{ data.todayCases if data.todayCases is not none else "N/A" }}</p>
+            <p><strong>Today Deaths:</strong> {{ data.todayDeaths if data.todayDeaths is not none else "N/A" }}</p>
+            <p><strong>Today Recovered:</strong> {{ data.todayRecovered if data.todayRecovered is not none else "N/A" }}</p>
+            <p><strong>Active Cases:</strong> {{ data.active if data.active is not none else "N/A" }}</p>
+        </div>
+    {% endif %}
 {% endblock %}
