@@ -1,7 +1,8 @@
-from flask import session, redirect, flash
+from flask import session, redirect, flash, request, jsonify
 from functools import wraps
 from pymongo import MongoClient
 from bson import ObjectId
+import os
 
 # Set up MongoDB connection
 client = MongoClient('mongodb://localhost:27017/')
@@ -29,4 +30,17 @@ def login_required(f):
                 return redirect("/logout")
         return f(*args, **kwargs)
 
+    return decorated_function
+
+def require_api_key(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # retrieve api key from header
+        api_key = request.headers.get('api_key')
+
+        # check if the api key is correct
+        if api_key != os.getenv("MY_APP_API_KEY"):
+            return jsonify({"status" : "error", "message" : "missing or invalid API key"}), 401
+        
+        return f(*args, **kwargs)
     return decorated_function
