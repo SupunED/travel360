@@ -3,7 +3,7 @@ from pymongo import MongoClient
 from flask_session import Session
 import requests
 import json
-from config import login_required
+from config import login_required, require_api_key
 from werkzeug.security import check_password_hash, generate_password_hash
 from bson import ObjectId
 from dotenv import load_dotenv
@@ -282,6 +282,26 @@ def records():
     user_id = session.get("user_id")
     saved_records = list(db.records.find({'user_id': user_id}))
     return render_template("records.html", records=saved_records)
+
+
+@app.route("/get", methods=["GET"])
+@require_api_key
+def get_all_records():
+    try:
+        # Note the two sets of curly braces:
+        # 1st {}: The query (empty = find all)
+        # 2nd {}: The projection (0 = hide this field)
+        records = list(db.records.find({}, {"_id": 0, "user_id": 0}))
+        
+        return jsonify({
+            "status": "success",
+            "count": len(records),
+            "data": records
+        }), 200
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+    
 
 if __name__ == "__main__":
     app.run(debug=True)

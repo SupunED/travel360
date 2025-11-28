@@ -35,12 +35,16 @@ def login_required(f):
 def require_api_key(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        # retrieve api key from header
-        api_key = request.headers.get('api_key')
-
-        # check if the api key is correct
-        if api_key != os.getenv("MY_APP_API_KEY"):
-            return jsonify({"status" : "error", "message" : "missing or invalid API key"}), 401
+        incoming_key = request.headers.get("api-key")
+        server_key = os.getenv("API_KEY")
         
+        # --- DEBUG PRINTS ---
+        print(f"DEBUG: Incoming Header: {incoming_key}")
+        print(f"DEBUG: Server Env Key: {server_key}")
+        # --------------------
+
+        if incoming_key != server_key:
+            return jsonify({"status": "error", "message": "missing or invalid API key"}), 403
+            
         return f(*args, **kwargs)
     return decorated_function
