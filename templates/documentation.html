@@ -1,4 +1,128 @@
 {% extends "layout.html" %}
+
 {% block title %}
     Documentation
+{% endblock %}
+
+{% block main %}
+<div class="container mt-5 text-start">
+    
+    <div class="mb-5">
+        <h1 class="display-4">Travel360° Documentation</h1>
+        <p class="lead text-muted">A comprehensive guide to the services, data sources, and developer API provided by Travel360.</p>
+    </div>
+
+    <hr>
+
+    <div class="row mb-5">
+        <div class="col-md-12">
+            <h3><i class="bi bi-gear-wide-connected"></i> Application Services</h3>
+            <p>Travel360° is a data aggregation platform designed to assist travelers in making informed decisions. The application provides the following core services:</p>
+            <ul>
+                <li><strong>Real-time Country Metadata:</strong> detailed information including currencies, capital cities, population, timezones, and regional data.</li>
+                <li><strong>COVID-19 Statistics:</strong> Up-to-date pandemic tracking including active cases, recovered patients, and daily statistics per country.</li>
+                <li><strong>User History:</strong> Authenticated users can save search results to their personal records for future reference.</li>
+                <li><strong>Secure Authentication:</strong> Local account management and Google OAuth 2.0 integration.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-md-12">
+            <h3><i class="bi bi-cloud-download"></i> External Data Sources</h3>
+            <p>To ensure data accuracy, Travel360 aggregates data from the following third-party APIs:</p>
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>API Name</th>
+                        <th>Usage</th>
+                        <th>Endpoint Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>REST Countries API</strong></td>
+                        <td>Retrieves geographical and political data (Capital, Flag, Population).</td>
+                        <td><code>https://restcountries.com/v3.1/name/{country}</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Disease.sh API</strong></td>
+                        <td>Retrieves specific COVID-19 statistics.</td>
+                        <td><code>https://disease.sh/v3/covid-19/countries/{country}</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Google OAuth 2.0</strong></td>
+                        <td>Handles secure user authentication and profile management.</td>
+                        <td><code>https://accounts.google.com/o/oauth2/auth</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-md-12">
+            <h3><i class="bi bi-code-slash"></i> Developer API Reference</h3>
+            <p>Travel360 exposes a public endpoint allowing developers to retrieve anonymized aggregated search records from our database.</p>
+
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <strong>GET</strong> <span class="text-monospace">/get</span>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Retrieve All Saved Records</h5>
+                    <p class="card-text">Returns a list of all country data records saved by users. User identities are stripped from the response for privacy.</p>
+                    
+                    <div class="alert alert-warning" role="alert">
+                        <strong>Authentication Required:</strong> This endpoint requires a valid API Key. 
+                        Ensure your request includes the correct API key configuration (header or query parameter).
+                    </div>
+
+                    <h6>Request Format</h6>
+                    <pre class="bg-light p-3 border rounded">GET /get HTTP/1.1
+Host: localhost:5000
+api-key: YOUR_API_KEY</pre>
+
+                    <h6>Response Body (JSON)</h6>
+                    <p>The API returns a JSON object containing the status, total count, and a list of data objects.</p>
+                    <pre class="bg-light p-3 border rounded">
+{
+  "status": "success",
+  "count": 2,
+  "data": [
+    {
+      "name": "France",
+      "capital": ["Paris"],
+      "population": 67391582,
+      "region": "Europe",
+      "active": 12050,
+      "todayCases": 500,
+      "todayDeaths": 12,
+      "flag": "https://flagcdn.com/w320/fr.png"
+    },
+    {
+      "name": "Japan",
+      "capital": ["Tokyo"],
+      "population": 125800000,
+      "region": "Asia",
+      "active": 5400,
+      "todayCases": 200,
+      "todayDeaths": 5,
+      "flag": "https://flagcdn.com/w320/jp.png"
+    }
+  ]
+}</pre>
+
+                    <h6>Status Codes</h6>
+                    <ul>
+                        <li><span class="badge bg-success">200 OK</span> - Request successful.</li>
+                        <li><span class="badge bg-danger">401 Unauthorized</span> - Missing or invalid API Key.</li>
+                        <li><span class="badge bg-danger">500 Internal Server Error</span> - Database connection issue.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
 {% endblock %}
